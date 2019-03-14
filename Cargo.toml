@@ -1,0 +1,7 @@
+[package]
+name = "lwe_key_negotiation_reconciliation"
+version = "0.1.0"
+authors = ["Chelsea H. Komlo <me@chelseakomlo.com>"]
+edition = "2018"
+
+[dependencies]
