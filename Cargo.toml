@@ -5,3 +5,4 @@ authors = ["Chelsea H. Komlo <me@chelseakomlo.com>"]
 edition = "2018"
 
 [dependencies]
+libmath = "0.1.4"
