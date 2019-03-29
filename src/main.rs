@@ -3,10 +3,8 @@
 // First, we'll just do Ding's reconciliation technique, but later we can do more.
 fn ding_hint(x: i32, q: i32) -> i32 {
     let upper_bound = (q-1) / 4;
-    print!("upper bound! {:?} \n", upper_bound);
 
     let lower_bound = (-1) * upper_bound;
-    print!("lower_bound! {:?} \n", lower_bound);
 
     if x < upper_bound && x > lower_bound {
         return 0;
@@ -54,6 +52,14 @@ fn convert_to_q_over_2(q: i32) -> Vec<i32> {
     numbers_modulo_q_over_2
 }
 
+// Extract takes an integer value and a hint, and extracts the underlying real
+// value without the error terms
+fn extract(x: i32, hint: i32, q: i32) -> i32 {
+    let signal = hint * (q-1) / 2;
+
+    (x + signal % q) % 2
+}
+
 fn main() {
     println!("testing ding!");
 
@@ -93,7 +99,6 @@ mod test {
 
     #[test]
     fn test_convert_to_q_over_2() {
-
         let res = convert_to_q_over_2(31);
 
         // Ensure that the correct q/4 buckets were created, partitioning the
@@ -114,5 +119,60 @@ mod test {
         // fourth quartile
         assert_eq!(res[29], -2);
         assert_eq!(res[30], -1);
+    }
+
+    #[test]
+    fn test_extract_prime_one() {
+
+        // ensure that two independent values round to the same bit
+        // Subject to the constraints:
+        // The error term |x-y| must be even and less than (q/4) - 2
+
+        // test values that naively would round to different values.
+
+        let q = 31;
+
+        {
+            let x = 6;
+            let y = 8;
+
+            // test these in both directions
+            let x_hint = ding_hint(x, q);
+            let y_hint = ding_hint(y, q);
+            {
+                let rounded_x = extract(x, x_hint, q);
+                let rounded_y = extract(y, x_hint, q);
+                assert_eq!(rounded_x, rounded_y);
+            }
+            {
+                let rounded_x = extract(x, y_hint, q);
+                let rounded_y = extract(y, y_hint, q);
+                assert_eq!(rounded_x, rounded_y);
+            }
+        }
+        {
+            let x = 5;
+            let y = 7;
+            let x_hint = ding_hint(x, q);
+            let y_hint = ding_hint(y, q);
+            {
+                let rounded_x = extract(x, x_hint, q);
+                let rounded_y = extract(y, x_hint, q);
+                assert_eq!(rounded_x, rounded_y);
+            }
+            {
+                let rounded_x = extract(x, y_hint, q);
+                let rounded_y = extract(y, y_hint, q);
+                assert_eq!(rounded_x, rounded_y);
+            }
+        }
+        {
+            let x = 7;
+            let y = 11;
+            let x_hint = ding_hint(x, q);
+            let rounded_x = extract(x, x_hint, q);
+            let rounded_y = extract(y, x_hint, q);
+            assert_eq!(rounded_x, rounded_y);
+        }
     }
 }
